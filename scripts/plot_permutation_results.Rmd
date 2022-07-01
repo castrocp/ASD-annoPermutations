@@ -1,0 +1,53 @@
+---
+title: "Permutation Results"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyr)
+library(ggplot2)
+library(ggsignif)
+library(wesanderson)
+library(here)
+```
+
+
+```{r load data}
+perm_df <- read.table(here::here("data", "permuted_annotation_counts.txt"), sep = "\t", header = FALSE)
+```
+
+```{r}
+# For the random bar I'm using the permuted sibling counts
+perm_long_df <- data.frame(annotation = rep(c("Fetal brain promoters", "TURF generic top 5%", "TURF brain top 5%", "Missense", "High impact coding"), each = 3),
+                           child = rep(c("proband", "sibling", "random"), times = 5),
+                           counts = c(1806, 1732, 1749, 7370, 7146, 7178, 6828, 6540, 6606, 1572, 1480, 1511, 126, 74, 99),
+                           random_stdev = c(NA,NA,31.90973,NA,NA, 59.18584,NA,NA, 56.96845, NA,NA, 27.49049, NA, NA, 6.943695))
+```
+
+```{r plot}
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+ggplot(perm_long_df, aes(x=annotation, y=counts, fill=child)) +
+  geom_bar(position = "dodge", stat = "identity", alpha = .9) +
+  geom_signif(y_position = c(1900,6900,7450), xmin = c(.75,1.75,2.75), xmax = c(1.25, 2.25, 3.25),
+              annotation = c("NS", "NS", "NS"), tip_length = 0) +
+  theme_bw(base_size = 12) +
+  theme(axis.title.x = element_text(margin = margin(t=6, r=0, b=0, l=0)), #space between axis labels and title
+        axis.title.y = element_text(margin = margin(t=0, r=6, b=0, l=0))) +
+  labs(
+    x = "Annotation category",
+    y = "Number of dnSNVs",
+    fill = "Group") +
+  ylim(0,8000)
+  # scale_fill_brewer(palette = "Set2")+
+  # scale_color_brewer(palette = "Set2")
+#  geom_errorbar(aes(ymin=counts-random_stdev, ymax=counts+random_stdev), width = .2, position = position_dodge(.9))
+```
+
+```{r}
+ggsave(here::here ("figures", "annotation_counts_bar.png"), width = 2100, height = 1200, units = "px")
+```
+
