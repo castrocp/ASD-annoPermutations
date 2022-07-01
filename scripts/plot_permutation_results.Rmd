@@ -45,6 +45,7 @@ ggplot(perm_long_df, aes(x=annotation, y=counts, fill=child)) +
   # scale_fill_brewer(palette = "Set2")+
   # scale_color_brewer(palette = "Set2")
 #  geom_errorbar(aes(ymin=counts-random_stdev, ymax=counts+random_stdev), width = .2, position = position_dodge(.9))
+#test
 ```
 
 ```{r}
